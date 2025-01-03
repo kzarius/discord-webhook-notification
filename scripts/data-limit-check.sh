@@ -33,7 +33,7 @@ usage() {
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -m|--message)
-            jsonMessage="$2"
+            json_msg="$2"
             shift 2
             ;;
         -d|--debug)
@@ -53,7 +53,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check if JSON is provided and not empty
-if [ -z "${jsonMessage}" ]; then
+if [ -z "${json_msg}" ]; then
     echo "Error: The --message option is mandatory." >&2
     usage
     exit 2
@@ -78,23 +78,23 @@ limits=(
 )
 
 # Set limit parameter names
-limitParameters="name section value type critical count"
+limit_params="name section value type critical count"
 
 # Initialize result variables
-criticalResult=false
-outsideLimits=false
+critical_result=false
+outside_limits=false
 results=""
-totalCharactersAllEmbeds=0
+total_chars_all_embeds=0
 
 #### LIMIT CHECK & RESULTS FUNCTION ####
 
 # Get count, check against limit and update results
 function updateResults() {
 
-    local indexedSection="$1"
+    local index_sections="$1"
 
     # Get the object/character count if section is an object
-    [ "${indexedSection}" != "na" ] && count=$(jq "$indexedSection | length" <<< "${jsonMessage}")
+    [ "${index_sections}" != "na" ] && count=$(jq "$index_sections | length" <<< "${json_msg}")
 
     # Output info if debug enabled
     [ ${debug} ] && echo "${name}: ${count} / ${value}" >&2
@@ -103,18 +103,18 @@ function updateResults() {
     if [[ ${count} -gt ${value} ]]; then
 
         # Set 'outside limit' flag
-        outsideLimits=true
+        outside_limits=true
 
         # Check if limit is a critical one
         if [ "${critical}" == "1" ]; then
 
             # Set 'critical limit' flag
-            criticalResult=true
+            critical_result=true
 
         fi
 
         # Append to result if outside limit
-        results+="${name} ${indexedSection} ${value} ${type} ${critical} ${count}\n"
+        results+="${name} ${index_sections} ${value} ${type} ${critical} ${count}\n"
 
     fi
 
@@ -126,41 +126,41 @@ function updateResults() {
 for limit in "${limits[@]}"; do
 
     # Read parameters from limit
-    IFS=' ' read -r $limitParameters <<< "$limit"
+    IFS=' ' read -r $limit_params <<< "$limit"
 
     # Check if limit relates to the embeds section
     if [[ "${section}" == *"embeds[]"* ]]; then
 
         # Check each embed section individually for applicable limits
-        for (( i=0; i<$(jq ".embeds | length" <<< "${jsonMessage}"); i++ )); do
+        for (( i=0; i<$(jq ".embeds | length" <<< "${json_msg}"); i++ )); do
 
             # Inject array index in embeds element for correct parsing
-            embedSection="${section/embeds[]/embeds[${i}]}"
+            embed_section="${section/embeds[]/embeds[${i}]}"
 
             # Check if section is a field section as this is an array
             if [[ "${section}" == *"fields[]"* ]]; then
 
                 # Check each field section individually for applicable limits
-                for (( j=0; j<$(jq ".embeds[$i].fields | length" <<< "${jsonMessage}"); j++ )); do
+                for (( j=0; j<$(jq ".embeds[$i].fields | length" <<< "${json_msg}"); j++ )); do
 
                     # Inject array index in fields element for correct parsing
-                    fieldSection="${embedSection/fields[]/fields[${j}]}"
+                    field_section="${embed_section/fields[]/fields[${j}]}"
 
                     # Check limits and update results
-                    updateResults "${fieldSection}"
+                    updateResults "${field_section}"
 
                     # Add to total characters if character type
-                    [ "${type}" == "char" ] && ((embedTotals[$i]+=count))
+                    [ "${type}" == "char" ] && ((embed_totals[$i]+=count))
 
                 done
 
             else
 
                 # Check limits and update results
-                updateResults "${embedSection}"
+                updateResults "${embed_section}"
 
                 # Add to total characters if character type
-                [ "${type}" == "char" ] && ((embedTotals[$i]+=count))
+                [ "${type}" == "char" ] && ((embed_totals[$i]+=count))
 
             fi
 
@@ -169,20 +169,20 @@ for limit in "${limits[@]}"; do
     elif [[ "${name}" == "Totals" ]]; then
 
         # Read the total character count for each embed section
-        for count in "${embedTotals[@]}"; do
+        for count in "${embed_totals[@]}"; do
 
             # Check agains limit and update result
             updateResults "${section}" ${count}
 
             # Add to the overall total character count
-            ((totalCharactersAllEmbeds+=count))
+            ((total_chars_all_embeds+=count))
 
         done
 
     elif [[ "${name}" == "Total" ]]; then
 
         # Get the total character count for all embeds
-        count=${totalCharactersAllEmbeds}
+        count=${total_chars_all_embeds}
 
         # Check agains limit and update result
         updateResults "${section}" ${count}
@@ -203,11 +203,11 @@ done
 [ ${debug} ] && [ -n "${results}" ] && echo -e "${results%??}" >&2
 
 # Exit with appropriate status
-if ${criticalResult}; then
+if ${critical_result}; then
 
     exit 2
 
-elif ${outsideLimits}; then
+elif ${outside_limits}; then
 
     exit 1
 

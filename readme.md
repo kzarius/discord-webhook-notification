@@ -57,13 +57,13 @@ The **role id** is the Discord ID for a role you create on your Discord channel 
 
 To securely manage your Discord webhook token and other sensitive information, it's recommended to store these secret variables in a separate script. Ensure that this file is not publicly accessible or included in your version control system.
 
-- **`discordToken`**: Your Discord webhook token.
-- **`discordID`**: The Discord webhook ID.
-- **`discordUsername`**: The username for the notification message.
-- **`discordAvatarURL`**: The URL of the avatar for the notification.
-- **`discordRoleID`**: The role ID for mentions in the notification.
+- **`DISCORD_TOKEN`**: Your Discord webhook token.
+- **`DISCORD_ID`**: The Discord webhook ID.
+- **`DISCORD_USERNAME`**: The username for the notification message.
+- **`DISCORD_AVATAR_URL`**: The URL of the avatar for the notification.
+- **`DISCORD_ROLE_ID`**: The role ID for mentions in the notification.
 
-These variables are imported from a separate `discord-variables.sh` script, which you should configure with your Discord user and channel details.
+These variables are imported from an `.env` script, which you should configure with your Discord user and channel details.
 
 ### Limit Checks
 
