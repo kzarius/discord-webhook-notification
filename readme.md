@@ -23,7 +23,7 @@ This Bash script is designed to send notifications to a Discord channel using Di
 To use this script, you can follow the instructions below:
 
 ```shell
-Usage: ./discord-webhook.sh [OPTIONS]
+Usage: ./msg.sh [OPTIONS]
 
 Options:
   -c, --content <content>   Set the content of the Discord message.
@@ -63,7 +63,7 @@ To securely manage your Discord webhook token and other sensitive information, i
 - **`DISCORD_AVATAR_URL`**: The URL of the avatar for the notification.
 - **`DISCORD_ROLE_ID`**: The role ID for mentions in the notification.
 
-These variables are imported from an `.env` script, which you should configure with your Discord user and channel details.
+These variables are imported from a separate `.env` script, which you should configure with your Discord user and channel details.
 
 ### Limit Checks
 
@@ -82,17 +82,17 @@ The last message sendt will be saved to a file for debug purposes.
 Send a simple text message to Discord:
 
 ```shell
-./discord-webhook.sh -c "Hello, Discord!"
+./msg.sh -c "Hello, Discord!"
 ```
 
 Send a message with an embed field:
 
 ```shell
-./discord-webhook.sh -c "Check out this embed" -e '{"title":"Embed Title","description":"This is an example embed."}'
+./msg.sh -c "Check out this embed" -e '{"title":"Embed Title","description":"This is an example embed."}'
 ```
 
 Send a message with an attachment:
 
 ```shell
-./discord-webhook.sh -c "This webhook includes a file" -e '{"title":"Embed Title","description":"This is an example embed."}' -f "/home/user/cool.file"
+./msg.sh -c "This webhook includes a file" -e '{"title":"Embed Title","description":"This is an example embed."}' -f "/home/user/cool.file"
 ```
