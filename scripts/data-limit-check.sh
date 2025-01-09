@@ -89,7 +89,7 @@ total_characters_all_embeds=0
 #### LIMIT CHECK & RESULTS FUNCTION ####
 
 # Get count, check against limit and update results
-function update_results() {
+function updateResults() {
 
     local indexed_section="$1"
 
@@ -147,7 +147,7 @@ for limit in "${limits[@]}"; do
                     field_section="${embed_section/fields[]/fields[${j}]}"
 
                     # Check limits and update results
-                    update_results "${field_section}"
+                    updateResults "${field_section}"
 
                     # Add to total characters if character type
                     [ "${type}" == "char" ] && ((embed_totals[$i]+=count))
@@ -157,7 +157,7 @@ for limit in "${limits[@]}"; do
             else
 
                 # Check limits and update results
-                update_results "${embed_section}"
+                updateResults "${embed_section}"
 
                 # Add to total characters if character type
                 [ "${type}" == "char" ] && ((embed_totals[$i]+=count))
@@ -172,7 +172,7 @@ for limit in "${limits[@]}"; do
         for count in "${embed_totals[@]}"; do
 
             # Check agains limit and update result
-            update_results "${section}" ${count}
+            updateResults "${section}" ${count}
 
             # Add to the overall total character count
             ((total_characters_all_embeds+=count))
@@ -185,12 +185,12 @@ for limit in "${limits[@]}"; do
         count=${total_characters_all_embeds}
 
         # Check agains limit and update result
-        update_results "${section}" ${count}
+        updateResults "${section}" ${count}
 
     else
 
         # Check agains limit and update result
-        update_results "${section}"
+        updateResults "${section}"
 
     fi
 

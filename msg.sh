@@ -115,7 +115,7 @@ source ${script_path}/.env
 # Discord secret variables.
 discord_token=${DISCORD_TOKEN}
 discord_id=${DISCORD_ID}
-discord_usernam=${DISCORD_USER}
+discord_username=${DISCORD_USER}
 discord_avatar_url=${DISCORD_AVATAR_URL}
 discord_role_id=${DISCORD_ROLE_ID}
 
@@ -127,14 +127,15 @@ discord_msg_embeds=$(echo "${discord_msg_embeds}" | sed 's/\@admin/\<\@\&'${disc
 #### BUILD DISCORD MESSAGE ####
 
 # Complete the Discord JSON string.
-discord_json='{ "username":"'"${discord_usernam}"'",
-               "content":"'"${discord_msg_content}"'",
-               "avatar_url":"'"${discord_avatar_url}"'",
-               "allowed_mentions": {
-                 "roles": [ "'"${discord_role_id}"'" ]
-               },
-               "embeds": [ '${discord_msg_embeds%?}' ]
-             }'
+discord_json='{
+    "username":"'"${discord_username}"'",
+    "content":"'"${discord_msg_content}"'",
+    "avatar_url":"'"${discord_avatar_url}"'",
+    "allowed_mentions": {
+        "roles": [ "'"${discord_role_id}"'" ]
+    },
+    "embeds": [ '${discord_msg_embeds%?}' ]
+}'
 
 #### MESSAGE LIMIT CHECK & SEND ####
 
