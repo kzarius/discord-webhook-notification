@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### SCRIP USAGE FUNCTION ####
+#### SCRIPT USAGE FUNCTION ####
 
 # Usage function.
 usage() {
@@ -84,17 +84,17 @@ limit_params="name section value type critical count"
 critical_result=false
 outside_limits=false
 results=""
-total_chars_all_embeds=0
+total_characters_all_embeds=0
 
 #### LIMIT CHECK & RESULTS FUNCTION ####
 
 # Get count, check against limit and update results
-function updateResults() {
+function update_results() {
 
-    local index_sections="$1"
+    local indexed_section="$1"
 
     # Get the object/character count if section is an object
-    [ "${index_sections}" != "na" ] && count=$(jq "$index_sections | length" <<< "${json_msg}")
+    [ "${indexed_section}" != "na" ] && count=$(jq "$indexed_section | length" <<< "${json_msg}")
 
     # Output info if debug enabled
     [ ${debug} ] && echo "${name}: ${count} / ${value}" >&2
@@ -114,7 +114,7 @@ function updateResults() {
         fi
 
         # Append to result if outside limit
-        results+="${name} ${index_sections} ${value} ${type} ${critical} ${count}\n"
+        results+="${name} ${indexed_section} ${value} ${type} ${critical} ${count}\n"
 
     fi
 
@@ -147,7 +147,7 @@ for limit in "${limits[@]}"; do
                     field_section="${embed_section/fields[]/fields[${j}]}"
 
                     # Check limits and update results
-                    updateResults "${field_section}"
+                    update_results "${field_section}"
 
                     # Add to total characters if character type
                     [ "${type}" == "char" ] && ((embed_totals[$i]+=count))
@@ -157,7 +157,7 @@ for limit in "${limits[@]}"; do
             else
 
                 # Check limits and update results
-                updateResults "${embed_section}"
+                update_results "${embed_section}"
 
                 # Add to total characters if character type
                 [ "${type}" == "char" ] && ((embed_totals[$i]+=count))
@@ -172,25 +172,25 @@ for limit in "${limits[@]}"; do
         for count in "${embed_totals[@]}"; do
 
             # Check agains limit and update result
-            updateResults "${section}" ${count}
+            update_results "${section}" ${count}
 
             # Add to the overall total character count
-            ((total_chars_all_embeds+=count))
+            ((total_characters_all_embeds+=count))
 
         done
 
     elif [[ "${name}" == "Total" ]]; then
 
         # Get the total character count for all embeds
-        count=${total_chars_all_embeds}
+        count=${total_characters_all_embeds}
 
         # Check agains limit and update result
-        updateResults "${section}" ${count}
+        update_results "${section}" ${count}
 
     else
 
         # Check agains limit and update result
-        updateResults "${section}"
+        update_results "${section}"
 
     fi
 
